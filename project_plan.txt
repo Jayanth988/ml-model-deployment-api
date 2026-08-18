@@ -1,0 +1,33 @@
+Project: ML Model Deployment as a Monitored REST API
+
+Dataset: Iris Flower Classification Dataset
+
+Problem Type: Classification
+
+Goal: Predict iris flower species using flower measurements.
+
+API Input:
+
+- sepal_length
+- sepal_width
+- petal_length
+- petal_width
+
+API Output:
+
+- prediction
+- confidence
+
+Request Flow:
+
+User
+↓
+FastAPI
+↓
+Validation
+↓
+ML Model
+↓
+Prediction
+↓
+JSON Response
