@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
+from app.models.schemas import PredictionInput
 import joblib
+
 
 model = None
 
@@ -29,8 +31,13 @@ def root():
 
 
 @app.post("/predict")
-def predict():
-    features = [5.1, 3.5, 1.4, 0.2]
+def predict(data: PredictionInput):
+    features = [
+        data.sepal_length,
+        data.sepal_width,
+        data.petal_length,
+        data.petal_width
+    ]
 
     prediction = model.predict([features])
 
