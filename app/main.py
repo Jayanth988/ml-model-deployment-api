@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from app.models.schemas import PredictionInput
 import joblib
+import uuid
 
 
 model = None
@@ -25,10 +26,12 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 
-@app.get("/")
-def root():
-    return {"message": "ML API is alive"}
-
+@app.get("/health")
+def health():
+    return {
+        "status": "ok",
+        "model_loaded": model is not None
+    }
 
 @app.post("/predict")
 def predict(data: PredictionInput):
@@ -41,6 +44,14 @@ def predict(data: PredictionInput):
 
     prediction = model.predict([features])
 
+    probabilities = model.predict_proba([features])
+
+    confidence = probabilities[0][prediction[0]]
+
+    request_id = str(uuid.uuid4())
+
     return {
-        "prediction": int(prediction[0])
+        "prediction": int(prediction[0]),
+        "confidence": float(confidence),
+        "request_id": request_id
     }
