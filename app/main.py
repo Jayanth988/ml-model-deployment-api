@@ -1,8 +1,8 @@
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
-from app.models.schemas import PredictionInput, PredictionOutput
 from app.logging_config import setup_logging
+from app.routers.v1 import router as v1_router
 import joblib
 import uuid
 import time
@@ -25,6 +25,9 @@ async def lifespan(app: FastAPI):
     logger.info("Loading model")
 
     model = joblib.load("ml/saved_model/model.joblib")
+
+    app.state.model = model
+    app.state.logger = logger
 
     logger.info("Model loaded successfully")
 
@@ -96,62 +99,5 @@ async def prediction_shape_exception_handler(
     )
 
 
-@app.get("/health")
-def health():
-    return {
-        "status": "ok",
-        "model_loaded": model is not None
-    }
-
-
-@app.post(
-    "/predict",
-    response_model=PredictionOutput
-)
-def predict(data: PredictionInput, request: Request):
-
-    request_id = request.state.request_id
-
-    features = [
-        data.sepal_length,
-        data.sepal_width,
-        data.petal_length,
-        data.petal_width
-    ]
-
-    try:
-        prediction = model.predict([features])
-
-        probabilities = model.predict_proba([features])
-
-        confidence = probabilities[0][prediction[0]]
-
-    except Exception as exc:
-
-        logger.error(
-            "request_id=%s prediction failed: %s",
-            request_id,
-            exc,
-            exc_info=True
-        )
-
-        raise HTTPException(
-            status_code=500,
-            detail="Prediction failed"
-        )
-
-    prediction_value = int(prediction[0])
-    confidence_value = float(confidence)
-
-    logger.info(
-        "request_id=%s prediction succeeded prediction=%s confidence=%.4f",
-        request_id,
-        prediction_value,
-        confidence_value
-    )
-
-    return {
-        "prediction": prediction_value,
-        "confidence": confidence_value,
-        "request_id": request_id
-    }
+# Include API version 1 routes
+app.include_router(v1_router)
