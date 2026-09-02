@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
+from app.config import settings
 from app.logging_config import setup_logging
 from app.routers.v1 import router as v1_router
 import joblib
@@ -26,11 +27,11 @@ async def lifespan(app: FastAPI):
     logger.info("Loading model")
 
     model = joblib.load(
-        "ml/saved_model/model.joblib"
+        settings.MODEL_PATH
     )
 
     with open(
-        "ml/saved_model/metadata.json",
+        settings.METADATA_PATH,
         "r",
         encoding="utf-8"
     ) as metadata_file:
@@ -49,6 +50,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
+    title=settings.API_TITLE,
     lifespan=lifespan
 )
 
