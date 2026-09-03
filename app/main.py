@@ -1,9 +1,12 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
+
 from app.config import settings
 from app.logging_config import setup_logging
 from app.routers.v1 import router as v1_router
+from app.routers.v2 import router as v2_router
+
 import joblib
 import json
 import uuid
@@ -11,6 +14,7 @@ import time
 
 
 logger = setup_logging()
+
 model = None
 model_metadata = None
 
@@ -21,6 +25,7 @@ class PredictionShapeError(Exception):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+
     global model
     global model_metadata
 
@@ -57,6 +62,7 @@ app = FastAPI(
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
+
     request_id = str(uuid.uuid4())
 
     request.state.request_id = request_id
@@ -71,6 +77,7 @@ async def log_requests(request: Request, call_next):
         return response
 
     finally:
+
         duration = time.perf_counter() - start_time
 
         status_code = (
@@ -95,6 +102,7 @@ async def prediction_shape_exception_handler(
     request: Request,
     exc: PredictionShapeError
 ):
+
     request_id = getattr(
         request.state,
         "request_id",
@@ -117,3 +125,5 @@ async def prediction_shape_exception_handler(
 
 
 app.include_router(v1_router)
+
+app.include_router(v2_router)

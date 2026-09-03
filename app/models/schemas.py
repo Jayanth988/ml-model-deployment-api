@@ -50,6 +50,7 @@ class PredictionBatchInput(BaseModel):
     @field_validator("inputs")
     @classmethod
     def validate_batch_size(cls, value):
+
         if len(value) > settings.MAX_BATCH_SIZE:
             raise ValueError(
                 f"Batch size cannot exceed {settings.MAX_BATCH_SIZE}"
@@ -69,3 +70,10 @@ class ModelInfoOutput(BaseModel):
     model_version: str
     training_date: str
     feature_names: List[str]
+
+
+class PredictionV2Output(BaseModel):
+
+    prediction: int
+    probabilities: List[float]
+    request_id: str
