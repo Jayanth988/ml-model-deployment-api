@@ -1,34 +1,41 @@
 # ML Model Deployment as a Monitored REST API
 
+A production-oriented Machine Learning REST API built with FastAPI, scikit-learn, Pydantic, structured logging, automated testing, Docker, and Docker Compose.
+
 ## Project Goal
 
-Build a production-ready Machine Learning REST API using FastAPI.
+Build and deploy a Machine Learning model as a reliable REST API with:
+
+- Input validation
+- Model loading at application startup
+- Prediction and confidence scores
+- Batch predictions
+- API versioning
+- Structured logging
+- Request tracking
+- Environment-based configuration
+- Automated testing
+- Docker containerization
+- Docker Compose orchestration
 
 ## Dataset
 
 Iris Flower Classification Dataset
 
-## Problem Statement
+The model predicts one of three iris flower classes using four numerical measurements.
 
-Predict iris flower species using flower measurements.
+## Machine Learning Model
 
-## API Input
+- Algorithm: Random Forest Classifier
+- Library: scikit-learn
+- Model serialization: joblib
+- Features:
+  - sepal_length
+  - sepal_width
+  - petal_length
+  - petal_width
 
-- sepal_length
-- sepal_width
-- petal_length
-- petal_width
+The trained model is stored in:
 
-## API Output
-
-- prediction
-- confidence
-
-## Request Flow
-
-User
-→ FastAPI
-→ Validation
-→ ML Model
-→ Prediction
-→ JSON Response
+```text
+ml/saved_model/model.joblib

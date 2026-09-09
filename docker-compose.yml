@@ -1,0 +1,12 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - type: bind
+        source: ./ml/saved_model
+        target: /app/ml/saved_model
+        read_only: true
