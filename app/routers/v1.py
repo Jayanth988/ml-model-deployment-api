@@ -1,23 +1,21 @@
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
+
 from app.models.schemas import (
+    ModelInfoOutput,
+    PredictionBatchInput,
+    PredictionBatchOutput,
     PredictionInput,
     PredictionOutput,
-    PredictionBatchInput,
-    PredictionBatchOutput
 )
+from app.security import verify_api_key
+
 import time
 
 
 router = APIRouter(
     prefix="/api/v1",
-    tags=["v1"]
-)
-from app.models.schemas import (
-    PredictionInput,
-    PredictionOutput,
-    PredictionBatchInput,
-    PredictionBatchOutput,
-    ModelInfoOutput
+    tags=["v1"],
+    dependencies=[Depends(verify_api_key)]
 )
 
 
@@ -167,6 +165,8 @@ def predict_batch(
     return {
         "predictions": results
     }
+
+
 @router.get(
     "/model-info",
     response_model=ModelInfoOutput

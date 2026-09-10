@@ -39,3 +39,15 @@ The trained model is stored in:
 
 ```text
 ml/saved_model/model.joblib
+## Security and Robustness
+
+### API Key Authentication
+
+Protected API endpoints require an `X-API-Key` request header.
+
+The API key is loaded from environment-based configuration using Pydantic Settings and is not hardcoded in the application code.
+
+Missing or invalid API keys return:
+
+```text
+401 Unauthorized

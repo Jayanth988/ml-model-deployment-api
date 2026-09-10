@@ -1,45 +1,56 @@
 from typing import List
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.config import settings
 
 
-class PredictionInput(BaseModel):
+class StrictBaseModel(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        allow_inf_nan=False
+    )
+
+
+class PredictionInput(StrictBaseModel):
 
     sepal_length: float = Field(
         ...,
         gt=0,
-        description="Sepal length must be positive"
+        le=100,
+        description="Sepal length must be between 0 and 100"
     )
 
     sepal_width: float = Field(
         ...,
         gt=0,
-        description="Sepal width must be positive"
+        le=100,
+        description="Sepal width must be between 0 and 100"
     )
 
     petal_length: float = Field(
         ...,
         gt=0,
-        description="Petal length must be positive"
+        le=100,
+        description="Petal length must be between 0 and 100"
     )
 
     petal_width: float = Field(
         ...,
         gt=0,
-        description="Petal width must be positive"
+        le=100,
+        description="Petal width must be between 0 and 100"
     )
 
 
-class PredictionOutput(BaseModel):
+class PredictionOutput(StrictBaseModel):
 
     prediction: int
     confidence: float
     request_id: str
 
 
-class PredictionBatchInput(BaseModel):
+class PredictionBatchInput(StrictBaseModel):
 
     inputs: List[PredictionInput] = Field(
         ...,
@@ -59,12 +70,12 @@ class PredictionBatchInput(BaseModel):
         return value
 
 
-class PredictionBatchOutput(BaseModel):
+class PredictionBatchOutput(StrictBaseModel):
 
     predictions: List[PredictionOutput]
 
 
-class ModelInfoOutput(BaseModel):
+class ModelInfoOutput(StrictBaseModel):
 
     model_type: str
     model_version: str
@@ -72,7 +83,7 @@ class ModelInfoOutput(BaseModel):
     feature_names: List[str]
 
 
-class PredictionV2Output(BaseModel):
+class PredictionV2Output(StrictBaseModel):
 
     prediction: int
     probabilities: List[float]

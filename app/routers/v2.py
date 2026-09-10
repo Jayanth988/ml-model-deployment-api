@@ -1,14 +1,16 @@
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from app.models.schemas import (
     PredictionInput,
-    PredictionV2Output
+    PredictionV2Output,
 )
+from app.security import verify_api_key
 
 
 router = APIRouter(
     prefix="/api/v2",
-    tags=["v2"]
+    tags=["v2"],
+    dependencies=[Depends(verify_api_key)]
 )
 
 
