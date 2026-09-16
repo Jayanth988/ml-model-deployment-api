@@ -1,53 +1,73 @@
 # ML Model Deployment as a Monitored REST API
 
-A production-oriented Machine Learning REST API built with FastAPI, scikit-learn, Pydantic, structured logging, automated testing, Docker, and Docker Compose.
+A production-oriented Machine Learning REST API built with FastAPI and scikit-learn.
 
-## Project Goal
+This project demonstrates how to take a trained Machine Learning model and expose it through a reliable, validated, monitored, tested, and containerized REST API.
 
-Build and deploy a Machine Learning model as a reliable REST API with:
+## Project Overview
 
-- Input validation
-- Model loading at application startup
-- Prediction and confidence scores
+The project uses the Iris Flower Classification dataset and a Random Forest Classifier.
+
+The trained model is exposed through FastAPI with:
+
+- Input validation using Pydantic
+- Model loading during application startup
+- Single predictions
 - Batch predictions
 - API versioning
-- Structured logging
-- Request tracking
+- Prediction confidence and probabilities
+- API key authentication
+- Request IDs for tracing
+- Structured application logging
+- Prometheus metrics
 - Environment-based configuration
-- Automated testing
+- Automated pytest testing
 - Docker containerization
-- Docker Compose orchestration
+- Docker Compose
+- GitHub Actions CI
 
-## Dataset
-
-Iris Flower Classification Dataset
-
-The model predicts one of three iris flower classes using four numerical measurements.
-
-## Machine Learning Model
-
-- Algorithm: Random Forest Classifier
-- Library: scikit-learn
-- Model serialization: joblib
-- Features:
-  - sepal_length
-  - sepal_width
-  - petal_length
-  - petal_width
-
-The trained model is stored in:
+## Architecture
 
 ```text
-ml/saved_model/model.joblib
-## Security and Robustness
+                        Client
+                          |
+                          | HTTP Request
+                          v
+                 +-------------------+
+                 |     FastAPI       |
+                 |    Application    |
+                 +---------+---------+
+                           |
+                +----------+----------+
+                |                     |
+                v                     v
+        API Key Security        Pydantic Validation
+                |                     |
+                +----------+----------+
+                           |
+                           v
+                  Versioned API Router
+                   /api/v1 or /api/v2
+                           |
+                           v
+                 +-------------------+
+                 |   Loaded ML Model |
+                 | Random Forest     |
+                 +---------+---------+
+                           |
+                           v
+                    Prediction Result
+                           |
+             +-------------+-------------+
+             |                           |
+             v                           v
+        Structured Logs          Prometheus Metrics
+             |                           |
+             v                           v
+          logs/app.log               /metrics
 
-### API Key Authentication
 
-Protected API endpoints require an `X-API-Key` request header.
-
-The API key is loaded from environment-based configuration using Pydantic Settings and is not hardcoded in the application code.
-
-Missing or invalid API keys return:
-
-```text
-401 Unauthorized
+                 Docker Container
+                        |
+                        v
+                  Docker Compose
