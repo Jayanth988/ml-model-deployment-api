@@ -7,6 +7,7 @@ import joblib
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.config import settings
 from app.logging_config import setup_logging
@@ -56,6 +57,12 @@ app = FastAPI(
     title=settings.API_TITLE,
     lifespan=lifespan
 )
+
+
+# Prometheus monitoring
+instrumentator = Instrumentator()
+instrumentator.instrument(app)
+instrumentator.expose(app)
 
 
 allowed_origins = [

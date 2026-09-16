@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
+from prometheus_client import Counter
 
 from app.models.schemas import (
     ModelInfoOutput,
@@ -16,6 +17,14 @@ router = APIRouter(
     prefix="/api/v1",
     tags=["v1"],
     dependencies=[Depends(verify_api_key)]
+)
+
+
+# Custom ML metric
+PREDICTIONS_TOTAL = Counter(
+    "ml_predictions_total",
+    "Total number of successful ML predictions by predicted class.",
+    labelnames=("predicted_class",)
 )
 
 
@@ -69,6 +78,11 @@ def predict(data: PredictionInput, request: Request):
 
     prediction_value = int(prediction[0])
     confidence_value = float(confidence)
+
+    # Increment custom Prometheus ML metric
+    PREDICTIONS_TOTAL.labels(
+        predicted_class=str(prediction_value)
+    ).inc()
 
     logger.info(
         "request_id=%s prediction succeeded prediction=%s confidence=%.4f",
@@ -143,6 +157,11 @@ def predict_batch(
         confidence_value = float(
             probabilities[index][prediction_value]
         )
+
+        # Increment custom Prometheus ML metric
+        PREDICTIONS_TOTAL.labels(
+            predicted_class=str(prediction_value)
+        ).inc()
 
         results.append(
             PredictionOutput(
