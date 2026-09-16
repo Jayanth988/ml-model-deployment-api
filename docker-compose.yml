@@ -1,6 +1,10 @@
 services:
   api:
-    build: .
+    build:
+      context: .
+      args:
+        HTTP_PROXY: http://http.docker.internal:3128
+        HTTPS_PROXY: http://http.docker.internal:3128
     ports:
       - "8000:8000"
     env_file:
