@@ -5,10 +5,13 @@ services:
       args:
         HTTP_PROXY: http://http.docker.internal:3128
         HTTPS_PROXY: http://http.docker.internal:3128
+
     ports:
       - "8000:8000"
+
     env_file:
       - .env
+
     volumes:
       - type: bind
         source: ./ml/saved_model
